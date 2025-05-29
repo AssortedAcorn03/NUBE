@@ -166,7 +166,11 @@ public class Servidor {//Clase principal del servidor
 
         try (ServerSocket serverSocket = new ServerSocket(3000)) {
             System.out.println("Servidor iniciado. Escuchando en el puerto 3000.");//Mensaje de inicio del servidor en el puerto 2555
-
+            Connection connection = new Connect().getConnection();//Conectar a la base de datos
+            if (connection == null) {
+                System.out.println("No se pudo conectar a la base de datos. El servidor no puede iniciar.");
+                return; // Salir si no se puede conectar a la base de datos
+            }
             while (true) {//bucle infinito para aceptar conexiones de clientes
                 try {
                     Socket socket = serverSocket.accept();//aceptar la conexión del cliente

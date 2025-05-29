@@ -60,7 +60,7 @@ public class Cliente extends Frame {
 
 		// Conexión al servidor
 		try {
-			InetAddress ip = InetAddress.getByName("localhost"); // Cambiar si es remoto
+			InetAddress ip = InetAddress.getByName("192.168.0.46"); // Cambiar si es remoto
 			socket = new Socket(ip, 3000);
 			dis = new DataInputStream(socket.getInputStream());
 			dos = new DataOutputStream(socket.getOutputStream());
