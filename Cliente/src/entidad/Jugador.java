@@ -1,5 +1,7 @@
 package entidad;
 
+import Main.GamePanel;
+import Main.ManejadorTeclas;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -10,11 +12,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.imageio.ImageIO;
-
-import Main.GamePanel;
-import Main.ManejadorTeclas;
 import tile.ManejadorTiles;
 
 public class Jugador extends Entidad {
@@ -535,7 +533,7 @@ public class Jugador extends Entidad {
             // Dibujar el mensaje de muerte
             g2.setFont(new Font("Arial", Font.BOLD, 60));
             g2.setColor(Color.WHITE);
-            String mensajeMuerte = "¡Muerto Perro!";
+            String mensajeMuerte = "Haz muerto";
             java.awt.FontMetrics fm = g2.getFontMetrics();
             int x = (gP.getWidth() - fm.stringWidth(mensajeMuerte)) / 2;
             int y = gP.getHeight() / 2;
