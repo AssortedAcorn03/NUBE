@@ -8,7 +8,7 @@ import java.sql.Statement;
 
 public class Connect {
     // CORRECTA RUTA JDBC PARA SQLite (nota: no termina con '/')
-    public static final String URL = "jdbc:sqlite:C:/Users/metal/source/repos/Proyecto - Principios de computo en la nube/USUARIOS.db";
+    public static final String URL = "jdbc:sqlite:C:/Users/alexv/Documents/nube/NUBE/USUARIOS.db";
 
     public Connection getConnection() {
     try {
