@@ -1,6 +1,6 @@
-//Cliente.java
 package cliente;
 
+import Main.GamePanel;
 import java.awt.Button;
 import java.awt.Frame;
 import java.awt.Label;
@@ -16,10 +16,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-
 import javax.swing.JFrame;
-
-import Main.GamePanel;
 
 public class Cliente extends Frame {
 	private TextField usernameField, passwordField;
@@ -31,25 +28,12 @@ public class Cliente extends Frame {
 	public int clientId;
 
 	public Cliente() {
-		try {
-			// Conectar al servidor antes de mostrar la interfaz
-			// InetAddress ip = InetAddress.getByName("10.103.159.219");
-			InetAddress ip = InetAddress.getByName("192.168.100.121");
-			socket = new Socket(ip, 2555);
-			dis = new DataInputStream(socket.getInputStream());
-			dos = new DataOutputStream(socket.getOutputStream());
-		} catch (IOException e) {
-			System.out.println("Error al conectar con el servidor: " + e.getMessage());
-			statusLabel.setText("Error de conexión al servidor");
-		}
-
 		// Configuración de la ventana
-		setLayout(null); // Usamos layout nulo para tener control sobre la posición de los elementos
+		setLayout(null);
 		setTitle("Cliente - Autenticación");
 		setSize(400, 300);
 
-		// Elementos de la interfaz
-		Label userLabel = new Label("Usuario:");
+		Label userLabel = new Label("Username:");
 		userLabel.setBounds(120, 80, 60, 25);
 		add(userLabel);
 
@@ -57,7 +41,7 @@ public class Cliente extends Frame {
 		usernameField.setBounds(190, 80, 120, 25);
 		add(usernameField);
 
-		Label passwordLabel = new Label("Contraseña:");
+		Label passwordLabel = new Label("Password:");
 		passwordLabel.setBounds(120, 120, 60, 25);
 		add(passwordLabel);
 
@@ -74,14 +58,25 @@ public class Cliente extends Frame {
 		statusLabel.setBounds(150, 200, 200, 25);
 		add(statusLabel);
 
-		// Acción al presionar el botón de inicio de sesión
+		// Conexión al servidor
+		try {
+			InetAddress ip = InetAddress.getByName("localhost"); // Cambiar si es remoto
+			socket = new Socket(ip, 3000);
+			dis = new DataInputStream(socket.getInputStream());
+			dos = new DataOutputStream(socket.getOutputStream());
+		} catch (IOException e) {
+			System.out.println("❌ Error al conectar con el servidor: " + e.getMessage());
+			statusLabel.setText("Error de conexión al servidor");
+		}
+
+		// Acción del botón
 		loginButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				handleLoginButtonAction();
 			}
 		});
 
-		// Evento de tecla Enter para iniciar sesión
+		// Tecla Enter
 		usernameField.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -90,7 +85,6 @@ public class Cliente extends Frame {
 				}
 			}
 		});
-
 		passwordField.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -117,28 +111,25 @@ public class Cliente extends Frame {
 			String username = usernameField.getText();
 			String password = passwordField.getText();
 
-			// Validar que los campos no estén vacíos
 			if (username.isEmpty() || password.isEmpty()) {
 				statusLabel.setText("Campos no pueden estar vacíos.");
 				return;
 			}
 
-			// Enviar credenciales al servidor
 			System.out.println("Enviando credenciales al servidor...");
 			dos.writeUTF(username);
 			dos.writeUTF(password);
 
-			// Leer respuesta del servidor
 			String response = dis.readUTF();
 			statusLabel.setText(response);
-			clientId = dis.readInt(); // Leer el cliente ID
+			clientId = dis.readInt();
+
+			System.out.println("Respuesta del servidor: " + response);
 			System.out.println("ID recibido desde el servidor: " + clientId);
 
 			if (response.equals("Autenticación exitosa.")) {
 				System.out.println("Autenticación exitosa, iniciando el juego...");
-				// Cerrar la ventana de autenticación
 				dispose();
-				// Iniciar el juego si la autenticación es exitosa
 				iniciarJuego(clientId, dis, dos);
 			} else {
 				System.out.println("Autenticación fallida: " + response);
@@ -150,7 +141,6 @@ public class Cliente extends Frame {
 		}
 	}
 
-	// Método para iniciar el juego después de la autenticación
 	private void iniciarJuego(int clientId, DataInputStream dis, DataOutputStream dos) {
 		JFrame ventana = new JFrame();
 		ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -158,28 +148,20 @@ public class Cliente extends Frame {
 		ventana.setTitle("PCN - Juego");
 
 		GamePanel panelJuego = new GamePanel(clientId, dis, dos);
-		// if(dis == null || dos ==null){
-		// System.out.println("Error al iniciar el juego Los datos son nulos");
-		// }
-		// System.out.println("DataInputStream y DataOutPut es enviado de formar
-		// correcta");
 		ventana.add(panelJuego);
 		ventana.pack();
 
 		ventana.setLocationRelativeTo(null);
 		ventana.setVisible(true);
 
-		panelJuego.iniciarHebraJuego(); // Iniciar el loop del juego
+		panelJuego.iniciarHebraJuego();
 	}
 
 	private void closeConnection() {
 		try {
-			if (socket != null)
-				socket.close();
-			if (dis != null)
-				dis.close();
-			if (dos != null)
-				dos.close();
+			if (socket != null) socket.close();
+			if (dis != null) dis.close();
+			if (dos != null) dos.close();
 		} catch (IOException e) {
 			System.out.println("Error al cerrar la conexión: " + e.getMessage());
 		}

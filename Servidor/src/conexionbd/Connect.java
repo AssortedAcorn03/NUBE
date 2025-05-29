@@ -2,21 +2,36 @@ package conexionbd;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 
 public class Connect {
-    public static final String URL = "jdbc:sqlite:C:\\Users\\16150\\OneDrive\\Documents\\Computacion\\S204-2025 I\\Principios de Cómputo en la Nube\\USUARIOS.db";//la ruta de la base de datos
-    public static final String USER = "root";//nombre del usuario de la base de datos
-    public static final String PSWD = "Win2002Racedb$";//contraseña para acceder a la base de datos
-    
-    public Connection getConnection(){
-        Connection connection = null;//inicializar la conexión como nula
-        try{
-            Class.forName("com.mysql.cj.jdbc.Driver");//cargar el driver de la base de datos
-            connection = (Connection)DriverManager.getConnection(URL, USER, PSWD);//crear la conexión con la ruta, el usuario y la contraseña
-            System.out.println("SE ESTABLECIO LA CONEXION");//mensaje de que se estableció la conexión
-        }catch(Exception e) {
-            System.out.println("Error " + e.getMessage());//mensaje de error
+    // CORRECTA RUTA JDBC PARA SQLite (nota: no termina con '/')
+    public static final String URL = "jdbc:sqlite:C:/Users/metal/source/repos/Proyecto - Principios de computo en la nube/USUARIOS.db";
+
+
+    public Connection getConnection() {
+    try {
+        Class.forName("org.sqlite.JDBC");
+        Connection connection = DriverManager.getConnection(URL);
+        System.out.println("✅ Conexión establecida con SQLite");
+
+        // TEST: imprimir tabla
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT * FROM usuarios");
+        while (rs.next()) {
+            System.out.println("Usuario: " + rs.getString("user"));
         }
+        rs.close();
+        stmt.close();
+
         return connection;
+    } catch (Exception e) {
+        System.out.println("❌ Error al conectar con la base de datos: " + e.getMessage());
+        e.printStackTrace();
+        return null;
     }
+    }
+
 }

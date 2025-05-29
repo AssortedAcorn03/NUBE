@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -91,18 +91,32 @@ class MultiClientHandler extends Thread {
         }
     
         private boolean authenticate(String username, String password) {
-            // Implementación de la autenticación desde la base de datos
-            try (Connection conn = new Connect().getConnection();
-                 Statement stmt = conn.createStatement()) {
-                String query = "SELECT * FROM user WHERE usuario = '" + username + "' AND Pass = '" + password + "'";            ResultSet rs = stmt.executeQuery(query);
-                boolean isValid = rs.next();
-                rs.close();
-                return isValid;
-            } catch (Exception e) {
-                System.out.println("Error de autenticación: " + e.getMessage());
-                return false;
-            }
+    try (Connection conn = new Connect().getConnection();
+         PreparedStatement stmt = conn.prepareStatement(
+             "SELECT * FROM usuarios WHERE user = ? AND password = ?")) {
+
+        stmt.setString(1, username);
+        stmt.setString(2, password);
+
+        ResultSet rs = stmt.executeQuery();
+        boolean isValid = rs.next();
+        rs.close();
+
+        if (isValid) {
+            System.out.println("✅ Usuario autenticado: " + username);
+        } else {
+            System.out.println("❌ Usuario o contraseña incorrectos: " + username);
         }
+
+        return isValid;
+
+    } catch (Exception e) {
+        System.out.println("❌ Error de autenticación:");
+        e.printStackTrace(); // Esto es vital para detectar problemas
+        return false;
+    }
+}
+
     
 
         // Enviar las posiciones actualizadas a los demás clientes
@@ -150,8 +164,8 @@ public class Servidor {//Clase principal del servidor
         ArrayList<String> correos = new ArrayList<>();//inicializar la lista de correos
    
 
-        try (ServerSocket serverSocket = new ServerSocket(2555)) {
-            System.out.println("Servidor iniciado. Escuchando en el puerto 2555.");//Mensaje de inicio del servidor en el puerto 2555
+        try (ServerSocket serverSocket = new ServerSocket(3000)) {
+            System.out.println("Servidor iniciado. Escuchando en el puerto 3000.");//Mensaje de inicio del servidor en el puerto 2555
 
             while (true) {//bucle infinito para aceptar conexiones de clientes
                 try {
